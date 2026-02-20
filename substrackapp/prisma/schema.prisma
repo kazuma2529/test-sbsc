@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id               String         @id @default(cuid())
+  email            String         @unique
+  passwordHash     String
+  slackWebhookUrl  String?
+  notifyDaysBefore String         @default("7,3,1")
+  darkMode         Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  subscriptions    Subscription[]
+}
+
+model Subscription {
+  id           String        @id @default(cuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  name         String
+  category     Category
+  planType     PlanType
+  amount       Int           @default(0)
+  billingCycle BillingCycle?
+  expiresAt    DateTime
+  status       Status        @default(ACTIVE)
+  memo         String?
+  createdAt    DateTime      @default(now())
+}
+
+enum Category {
+  AI
+  ENTERTAINMENT
+  MUSIC
+  OTHER
+}
+
+enum PlanType {
+  FREE
+  PAID
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum Status {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  EXPIRED
+}
